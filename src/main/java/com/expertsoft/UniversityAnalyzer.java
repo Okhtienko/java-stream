@@ -52,7 +52,7 @@ public class UniversityAnalyzer {
                         Period.between(dateOfBirthOfStudent.getBirthday(), currentDate).getYears()
                 )
                 .min()
-                .getAsInt();
+                .orElse(-1);
     }
 
     /**
@@ -71,10 +71,10 @@ public class UniversityAnalyzer {
                                         .stream()
                                         .mapToInt(SubjectMark::getMark)
                                         .average()
-                                        .getAsDouble()
+                                        .orElse(0)
                                 )
                 )
-                .get();
+                .orElse(null);
     }
 
     /**
@@ -131,7 +131,7 @@ public class UniversityAnalyzer {
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
-                .get();
+                .orElse(null);
     }
 
     /**
@@ -150,7 +150,7 @@ public class UniversityAnalyzer {
                         .stream()
                         .mapToInt(SubjectMark::getMark)
                         .average()
-                        .getAsDouble() >= 8)
+                        .orElse(0) >= 8)
                 .sorted(Comparator.comparing(Student::getSurname))
                 .collect(Collectors.toList());
     }
@@ -171,11 +171,11 @@ public class UniversityAnalyzer {
                                         .flatMap(student -> student.getSubjectMarks().stream())
                                         .mapToInt(SubjectMark::getMark)
                                         .average()
-                                        .getAsDouble()
+                                        .orElse(0)
                         )
                 )
-                .get()
-                .getHead();
+                .map(Department::getHead)
+                .orElse(null);
     }
 
     /**
@@ -185,11 +185,11 @@ public class UniversityAnalyzer {
      * @return
      */
     public List<Subject> getSubjectsThatHeadTeachesInHisDepartment(Department department) {
-        Teacher head = department.getHead();
-        return department.
-                getSubjects()
+        return department
+                .getHead()
+                .getTaughtSubjects()
                 .stream()
-                .filter(subject -> subject.getId() == head.getId())
+                .filter(department.getSubjects()::contains)
                 .collect(Collectors.toList());
     }
 }
